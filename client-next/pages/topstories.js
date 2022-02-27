@@ -1,34 +1,9 @@
-import axiosConfig from "../axiosConfig"
-
-async function getItem(Id) {
-    return axiosConfig.get('/item/' + Id + '.json')
-        .then(result => {
-           return result.data 
-        },
-        err => {
-           console.log(err.message) 
-        })
-}
-
-async function getAll() {
-    return axiosConfig.get('/topstories.json')
-        .then(result => {
-            let promises = [];
-            result.data.forEach(id => {
-                promises.push(getItem(id));
-            })
-            return promises;
-        },
-        err => {
-            console.log(err.message)
-        }) 
-}
+import { Router, useRouter } from 'next/router';
+import { getTopStories } from "../getter";
 
 export async function getServerSideProps(context) {
-    const promises = await getAll();
+    const promises = await getTopStories();
     const data = await Promise.all(promises).catch((err) => console.log(err.message));
-
-    console.log(data);
     
     return {
         props: {
@@ -51,6 +26,14 @@ export default function Index({data}) {
 function Story({data}) {
     const date = new Date(data.time * 1000).toLocaleDateString("en-US")
     const time = new Date(data.time * 1000).toLocaleTimeString("en-US")
+    const router = useRouter();
+    
+    const goComment = () => {
+        router.push({
+            pathname: "/comments",
+            query: {id: data.id} 
+        })
+    }
     return (
         <div class="column is-6-tablet is-4-desktop is-3-widescreen">
             <article class="box">
@@ -64,6 +47,11 @@ function Story({data}) {
                                 Title: <a href={data.url}>{data.title}</a> <br />
                             </p>
                         </div>
+                        <nav class="level is-mobile">
+                            <div class="level-left">
+                                <button class="level-item button is-small" onClick={goComment}>Comments</button>
+                            </div>
+                        </nav>
                     </div>
                 </div>
             </article>
