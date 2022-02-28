@@ -41,6 +41,7 @@ function Story({data}) {
                     <div class="media-content">
                         <div class="content">
                             <p>
+                                ID: {data.id} <br />
                                 By: {data.by} <br />
                                 Score: {data.score} <br />
                                 Date: {date} {time} <br />
