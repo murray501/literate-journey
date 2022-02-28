@@ -51,13 +51,10 @@ function CommentEach({data}) {
         <article class="box">
             <div class="media">
                 <div class="media-content">
-                    <div class="content">
-                        <p>
-                            ID: {data.id} <br />
-                            By: {data.by} <br />
-                            Date: {date} {time} <br />
-                            {text}
-                        </p>
+                    <div class="content is-small">
+                        {text}
+                        By: {data.by} <br />
+                        Date: {date} {time} <br />
                     </div>
                     {data.kids ? 
                     <nav class="level is-mobile">
@@ -78,13 +75,12 @@ function Story({data}) {
     const date = new Date(data.time * 1000).toLocaleDateString("en-US")
     const time = new Date(data.time * 1000).toLocaleTimeString("en-US")
     return (
-        <p>
-            ID: {data.id} <br />
+        <div class="content is-small">
+            <a href={data.url}>{data.title}</a>
             By: {data.by} <br />
             Score: {data.score} <br />
             Date: {date} {time} <br />
-            Title: <a href={data.url}>{data.title}</a>
-        </p>
+        </div>
     )
 }
 
@@ -93,12 +89,12 @@ function Comment({data}) {
     const time = new Date(data.time * 1000).toLocaleTimeString("en-US")
     const text = data.text ? parse(data.text) : ""
     return (
-        <p>
+        <div class="content is-small">
+            {text}
             ID: {data.id} <br />
             By: {data.by} <br />
             Date: {date} {time} <br />
-            {text}
-        </p>
+        </div>
     )
 }
 
@@ -111,9 +107,7 @@ function Parent({data}) {
             <article>
                 <div class="media">
                     <div class="media-content">
-                        <div class="content">
-                            {data.type === "story" ? <Story data={data} /> : <Comment data={data} /> }
-                        </div>
+                        {data.type === "story" ? <Story data={data} /> : <Comment data={data} /> }
                     </div>
                 </div>
             </article>

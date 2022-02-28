@@ -10,7 +10,6 @@ export async function getServerSideProps(context) {
             data: data
         }
     }
-
 }
 
 export default function Index({data}) {
@@ -39,14 +38,11 @@ function Story({data}) {
             <article class="box">
                 <div class="media">
                     <div class="media-content">
-                        <div class="content">
-                            <p>
-                                ID: {data.id} <br />
-                                By: {data.by} <br />
-                                Score: {data.score} <br />
-                                Date: {date} {time} <br />
-                                Title: <a href={data.url}>{data.title}</a> <br />
-                            </p>
+                        <div class="content is-small">
+                            <a href={data.url}>{data.title}</a> <br />
+                            By: {data.by} <br />
+                            Score: {data.score} <br />
+                            Date: {date} {time} <br />
                         </div>
                         <nav class="level is-mobile">
                             <div class="level-left">
