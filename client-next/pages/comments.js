@@ -1,9 +1,11 @@
 import { Router, useRouter } from 'next/router';
-import { getItem, getKids } from '../getter';
+import { getItem, getKids, getCache } from '../getter';
 import parse from 'html-react-parser';
 
 export async function getServerSideProps(context) {
     const id = context.query.id;
+    //const parent = context.query.type ? getCache(id, context.query.type) : await getItem(id); 
+    getCache(id, context.query.type);
     const parent = await getItem(id);
     const promises = await getKids(parent.kids);
     const kids = await Promise.all(promises).catch((err) => console.log(err.message));
