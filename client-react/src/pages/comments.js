@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import {useParams, useNavigate} from "react-router-dom";
-import { getKids, getCache} from '../getter';
+import { getKids, getCache, saveComment, saveBookmark} from '../getter';
 import parse from 'html-react-parser';
 
 export default function Comments() {
@@ -35,11 +35,9 @@ export default function Comments() {
 
 function Kids({data}) {
     return (
-        <div class="columns">
-            <div class="column">
-                {data.map (x => <CommentEach data={x} />)}
-            </div>
-        </div>
+        <>
+            {data.map (x => <CommentEach data={x} />)}
+        </>
     )
 }
 
@@ -50,7 +48,13 @@ function CommentEach({data}) {
     const navigate = useNavigate();
     
     const goComment = () => {
+        saveComment(data)
         navigate(`/comments/${data.id}/comments`)
+    }
+
+    const goBookmark = () => {
+        saveBookmark(data, 'comments')
+        navigate('/bookmarks')
     }
 
     return (
@@ -58,19 +62,24 @@ function CommentEach({data}) {
             <div class="media">
                 <div class="media-content">
                     <div class="content is-small">
-                        {text}
+                            {text}
                         By: {data.by} <br />
                         Date: {date} {time} <br />
-                    </div>
-                    {data.kids ? 
+                    </div> 
                     <nav class="level is-mobile">
                         <div class="level-left">
-                            <button class="level-item button is-small" onClick={goComment}>Comments</button>
+                            {data.kids ? 
+                            <div class="level-item">
+                                <button class="level-item button is-small" onClick={goComment}>Comments</button>
+                            </div>
+                            :
+                            <></>
+                            }
+                            <div class="level-item">
+                                <button class="level-item button is-small" onClick={goBookmark}>Bookmark</button>
+                            </div>
                         </div>
                     </nav>
-                    : 
-                    <></>
-                    }
                 </div>
             </div>
         </article>
@@ -95,12 +104,12 @@ function Comment({data}) {
     const time = new Date(data.time * 1000).toLocaleTimeString("en-US")
     const text = data.text ? parse(data.text) : ""
     return (
-        <div class="content is-small">
+        <p class="content is-small">
             {text}
             ID: {data.id} <br />
             By: {data.by} <br />
             Date: {date} {time} <br />
-        </div>
+        </p>
     )
 }
 

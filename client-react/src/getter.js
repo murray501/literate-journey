@@ -1,7 +1,7 @@
 import axiosConfig from "./axiosConfig";
 
-const loadJSON = key => key && JSON.parse(localStorage.getItem(key));
-const saveJSON = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+export const loadJSON = key => key && localStorage.getItem(key) && JSON.parse(localStorage.getItem(key));
+export const saveJSON = (key, data) => localStorage.setItem(key, JSON.stringify(data));
 
 export async function getItem(Id) {
     return axiosConfig.get('/item/' + Id + '.json')
@@ -13,19 +13,34 @@ export async function getItem(Id) {
         })
 }
 
+export function saveComment(data) {
+    const previous = loadJSON('comments');
+    if (previous) {
+        previous.push(data);
+        saveJSON('comments', previous);
+    } else {
+        saveJSON('comments', [data]);
+    }
+}
+
+export function saveBookmark(data, type) {
+    data.type = type;
+    const bookmarks = loadJSON('bookmarks');
+    if (bookmarks) {
+        const newbookmarks = bookmarks.filter(x => x.id !== data.id);
+        newbookmarks.unshift(data);
+        saveJSON('bookmarks', newbookmarks);
+    } else {
+        saveJSON('bookmarks', [data]);
+    }
+}
+
 export async function getKids(ids) {
     let promises = [];
     ids.forEach(id => {
         promises.push(getItem(id));
     })
     const data = await Promise.all(promises).catch((err) => console.log(err.message));
-    const previous = loadJSON('comments');
-    if (previous) {
-        previous.push(...data);
-        saveJSON('comments', previous);
-    } else {
-        saveJSON('comments', data);
-    }
     return data;
 }
 
@@ -38,18 +53,28 @@ export function getCache(id, type) {
     }
 }
 
+async function getFromStorage(id, data) {
+    if (!data) {
+        return getItem(id);
+    }
+
+    const item = data.find(x => x.id === id);
+    if (item) {
+        return item;
+    } else {
+        return getItem(id);
+    }
+}
+
 export async function getStories(path) {
     const result = await axiosConfig.get('/' + path + '.json').catch(err => console.log(err.message));
     const ids = result.data;
     const key = path;
-    const value = loadJSON(key);
-    if (value) {
-        return value;
-    }
+    const storage = loadJSON(key);
 
     let promises = []
     ids.forEach(id => {
-        promises.push(getItem(id));
+        promises.push(getFromStorage(id, storage));
     })
 
     const data = await Promise.all(promises).catch((err) => console.log(err.message));
